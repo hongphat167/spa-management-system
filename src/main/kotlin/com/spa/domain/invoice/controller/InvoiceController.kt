@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1/invoices")
+@RequestMapping("/v1/invoices")
 class InvoiceController(
     private val invoiceService: InvoiceService
 ) {

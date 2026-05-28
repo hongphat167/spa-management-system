@@ -2,9 +2,15 @@
 
 import { Languages } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useEffect, useState } from "react";
 
 export default function LanguageSwitcher() {
   const { language, setLanguage } = useLanguage();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <button
@@ -12,7 +18,7 @@ export default function LanguageSwitcher() {
       onClick={() => setLanguage(language === "en" ? "vi" : "en")}
     >
       <Languages size={16} />
-      {language === "en" ? "EN" : "VI"}
+      {mounted ? (language === "en" ? "EN" : "VI") : null}
     </button>
   );
 }

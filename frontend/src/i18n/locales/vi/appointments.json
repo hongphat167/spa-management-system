@@ -1,1 +1,1 @@
-{"title":"Lịch hẹn","calendar":"Lịch","status":{"scheduled":"Đã lên lịch","inProgress":"Đang thực hiện","completed":"Hoàn thành","cancelled":"Đã hủy"}}
+{"title":"Lịch hẹn","calendar":"Lịch","columns":{"customer":"Khách hàng","therapist":"KTV","service":"Dịch vụ","time":"Thời gian","status":"Trạng thái"},"status":{"scheduled":"Đã lên lịch","inProgress":"Đang thực hiện","completed":"Hoàn thành","cancelled":"Đã hủy"}}

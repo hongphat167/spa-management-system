@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1/services")
+@RequestMapping("/v1/services")
 class SpaServiceController(
     private val spaServiceService: SpaServiceService
 ) {

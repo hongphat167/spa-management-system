@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
-import java.util.Optional
+import java.util.*
 
 @Repository
 interface CustomerRepository : JpaRepository<Customer, Long> {
@@ -14,7 +14,11 @@ interface CustomerRepository : JpaRepository<Customer, Long> {
     fun findByEmailAndDeletedAtIsNull(email: String): Optional<Customer>
     fun findByIdAndDeletedAtIsNull(id: Long): Optional<Customer>
 
-    @Query("SELECT c FROM Customer c WHERE c.deletedAt IS NULL")
+    @Query(
+        """
+        SELECT c FROM Customer c
+    """
+    )
     fun findAllActive(pageable: Pageable): Page<Customer>
 
     fun existsByEmailAndDeletedAtIsNull(email: String): Boolean

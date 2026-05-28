@@ -1,1 +1,1 @@
-{"title":"Customers","addCustomer":"Add Customer","search":"Search customers...","save":"Save","columns":{"name":"Name","email":"Email","phone":"Phone","bookings":"Bookings","points":"Loyalty Points"}}
+{"title":"Customers","addCustomer":"Add Customer","search":"Search customers...","save":"Save","columns":{"name":"Name","email":"Email","phone":"Phone","points":"Loyalty Points","spent":"Total Spent"}}

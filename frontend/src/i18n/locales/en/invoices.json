@@ -1,1 +1,1 @@
-{"title":"Invoices","markPaid":"Mark Paid","print":"Print","status":{"paid":"Paid","pending":"Pending","overdue":"Overdue"}}
+{"title":"Invoices","markPaid":"Mark Paid","print":"Print","columns":{"id":"ID","customer":"Customer","appointmentId":"Appointment ID","amount":"Amount","date":"Date","status":"Status"},"status":{"paid":"Paid","pending":"Pending","overdue":"Overdue"}}

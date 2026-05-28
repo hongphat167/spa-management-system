@@ -1,1 +1,1 @@
-{"title":"Hóa đơn","markPaid":"Đánh dấu đã thanh toán","print":"In hóa đơn","status":{"paid":"Đã thanh toán","pending":"Chờ thanh toán","overdue":"Quá hạn"}}
+{"title":"Hóa đơn","markPaid":"Đánh dấu đã thanh toán","print":"In hóa đơn","columns":{"id":"Mã","customer":"Khách hàng","appointmentId":"Mã lịch hẹn","amount":"Số tiền","date":"Ngày","status":"Trạng thái"},"status":{"paid":"Đã thanh toán","pending":"Chờ thanh toán","overdue":"Quá hạn"}}
