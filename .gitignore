@@ -1,0 +1,39 @@
+# Gradle
+.gradle/
+build/
+*.jar
+*.zip
+*.tar.gz
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Kotlin
+out/
+*.class
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Docker
+.dockerignore
+
+# Database
+data/
+*.db
+*.sqlite
+
+# Node (if needed)
+node_modules/
+npm-debug.log
