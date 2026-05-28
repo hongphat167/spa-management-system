@@ -1,93 +1,91 @@
 package com.spa.domain.invoice.service
 
-import com.spa.common.dto.PaginatedResponse
-import com.spa.common.dto.PaginationRequest
+import com.spa.domain.invoice.dto.InvoiceDto
 import com.spa.domain.invoice.entity.Invoice
+import com.spa.domain.invoice.mapper.InvoiceMapper
 import com.spa.domain.invoice.repository.InvoiceRepository
-import com.spa.exception.ResourceNotFoundException
-import org.springframework.data.domain.PageRequest
+import com.spa.common.exception.ResourceNotFoundException
+import com.spa.common.exception.BusinessLogicException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.math.BigDecimal
 
 @Service
 @Transactional
-class InvoiceService(private val invoiceRepository: InvoiceRepository) {
+class InvoiceService(
+    private val invoiceRepository: InvoiceRepository,
+    private val invoiceMapper: InvoiceMapper
+) {
 
-    fun createInvoice(invoice: Invoice): Invoice {
-        invoice.paymentStatus = "PENDING"
-        return invoiceRepository.save(invoice)
+    fun createInvoice(dto: InvoiceDto): InvoiceDto {
+        val invoice = invoiceMapper.toEntity(dto)
+        val saved = invoiceRepository.save(invoice)
+        return invoiceMapper.toDto(saved)
     }
 
-    fun updateInvoice(id: Long, invoice: Invoice): Invoice {
-        val existing = invoiceRepository.findByIdAndDeletedAtIsNull(id)
-            .orElseThrow { ResourceNotFoundException("Invoice not found with id: $id") }
-
-        existing.totalAmount = invoice.totalAmount
-        existing.taxAmount = invoice.taxAmount
-        existing.discountAmount = invoice.discountAmount
-        existing.dueAt = invoice.dueAt
-
-        return invoiceRepository.save(existing)
-    }
-
-    fun getInvoiceById(id: Long): Invoice {
-        return invoiceRepository.findByIdAndDeletedAtIsNull(id)
-            .orElseThrow { ResourceNotFoundException("Invoice not found with id: $id") }
-    }
-
-    fun getInvoiceByAppointmentId(appointmentId: Long): Invoice {
-        return invoiceRepository.findByAppointmentId(appointmentId)
-            .orElseThrow { ResourceNotFoundException("Invoice not found for appointment: $appointmentId") }
-    }
-
-    fun getCustomerInvoices(customerId: Long, paginationRequest: PaginationRequest): PaginatedResponse<Invoice> {
-        val pageable = PageRequest.of(paginationRequest.getPage(), paginationRequest.getSize())
-        val page = invoiceRepository.findByCustomerId(customerId, pageable)
-
-        return PaginatedResponse(
-            content = page.content,
-            page = page.number,
-            size = page.size,
-            totalElements = page.totalElements,
-            totalPages = page.totalPages,
-            isFirst = page.isFirst,
-            isLast = page.isLast,
-            hasNext = page.hasNext(),
-            hasPrevious = page.hasPrevious()
-        )
-    }
-
-    fun getAllInvoices(paginationRequest: PaginationRequest): PaginatedResponse<Invoice> {
-        val pageable = PageRequest.of(paginationRequest.getPage(), paginationRequest.getSize())
-        val page = invoiceRepository.findAllActive(pageable)
-
-        return PaginatedResponse(
-            content = page.content,
-            page = page.number,
-            size = page.size,
-            totalElements = page.totalElements,
-            totalPages = page.totalPages,
-            isFirst = page.isFirst,
-            isLast = page.isLast,
-            hasNext = page.hasNext(),
-            hasPrevious = page.hasPrevious()
-        )
-    }
-
-    fun markAsPaid(id: Long): Invoice {
+    @Transactional(readOnly = true)
+    fun getInvoiceById(id: Long): InvoiceDto {
         val invoice = invoiceRepository.findByIdAndDeletedAtIsNull(id)
             .orElseThrow { ResourceNotFoundException("Invoice not found with id: $id") }
-        invoice.paymentStatus = "PAID"
-        invoice.paidAt = LocalDateTime.now()
-        return invoiceRepository.save(invoice)
+        return invoiceMapper.toDto(invoice)
+    }
+
+    @Transactional(readOnly = true)
+    fun getAllInvoices(pageable: Pageable): Page<InvoiceDto> {
+        return invoiceRepository.findAllByDeletedAtIsNull(pageable)
+            .map { invoiceMapper.toDto(it) }
+    }
+
+    @Transactional(readOnly = true)
+    fun getInvoicesByCustomerId(customerId: Long, pageable: Pageable): Page<InvoiceDto> {
+        return invoiceRepository.findAllByCustomerIdAndDeletedAtIsNull(customerId, pageable)
+            .map { invoiceMapper.toDto(it) }
+    }
+
+    @Transactional(readOnly = true)
+    fun getPendingInvoices(pageable: Pageable): Page<InvoiceDto> {
+        return invoiceRepository.findAllByPaymentStatusAndDeletedAtIsNull("PENDING", pageable)
+            .map { invoiceMapper.toDto(it) }
+    }
+
+    fun updateInvoice(id: Long, dto: InvoiceDto): InvoiceDto {
+        val invoice = invoiceRepository.findByIdAndDeletedAtIsNull(id)
+            .orElseThrow { ResourceNotFoundException("Invoice not found with id: $id") }
+        
+        invoice.apply {
+            totalAmount = dto.totalAmount
+            taxAmount = dto.taxAmount
+            discountAmount = dto.discountAmount
+            dueAt = dto.dueAt
+        }
+        
+        val updated = invoiceRepository.save(invoice)
+        return invoiceMapper.toDto(updated)
+    }
+
+    fun markAsPaid(id: Long): InvoiceDto {
+        val invoice = invoiceRepository.findByIdAndDeletedAtIsNull(id)
+            .orElseThrow { ResourceNotFoundException("Invoice not found with id: $id") }
+        
+        if (invoice.paymentStatus == "PAID") {
+            throw BusinessLogicException("Invoice is already paid")
+        }
+        
+        invoice.apply {
+            paymentStatus = "PAID"
+            paidAt = LocalDateTime.now()
+        }
+        
+        val updated = invoiceRepository.save(invoice)
+        return invoiceMapper.toDto(updated)
     }
 
     fun deleteInvoice(id: Long) {
         val invoice = invoiceRepository.findByIdAndDeletedAtIsNull(id)
             .orElseThrow { ResourceNotFoundException("Invoice not found with id: $id") }
-        invoice.delete()
+        invoice.deletedAt = LocalDateTime.now()
         invoiceRepository.save(invoice)
     }
 }

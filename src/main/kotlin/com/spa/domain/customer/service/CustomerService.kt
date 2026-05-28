@@ -1,90 +1,80 @@
 package com.spa.domain.customer.service
 
-import com.spa.common.dto.PaginatedResponse
-import com.spa.common.dto.PaginationRequest
+import com.spa.domain.customer.dto.CustomerDto
 import com.spa.domain.customer.entity.Customer
+import com.spa.domain.customer.mapper.CustomerMapper
 import com.spa.domain.customer.repository.CustomerRepository
-import com.spa.exception.ConflictException
-import com.spa.exception.ResourceNotFoundException
-import com.spa.exception.ValidationException
-import org.springframework.data.domain.PageRequest
+import com.spa.common.exception.ResourceNotFoundException
+import com.spa.common.exception.ValidationException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.math.BigDecimal
 
 @Service
 @Transactional
-class CustomerService(private val customerRepository: CustomerRepository) {
+class CustomerService(
+    private val customerRepository: CustomerRepository,
+    private val customerMapper: CustomerMapper
+) {
 
-    fun createCustomer(customer: Customer): Customer {
-        if (customerRepository.existsByEmailAndDeletedAtIsNull(customer.email)) {
-            throw ConflictException("Customer with email ${customer.email} already exists")
-        }
-        return customerRepository.save(customer)
+    fun createCustomer(dto: CustomerDto): CustomerDto {
+        validateEmailUniqueness(dto.email)
+        val customer = customerMapper.toEntity(dto)
+        val saved = customerRepository.save(customer)
+        return customerMapper.toDto(saved)
     }
 
-    fun updateCustomer(id: Long, customer: Customer): Customer {
-        val existing = customerRepository.findByIdAndDeletedAtIsNull(id)
+    @Transactional(readOnly = true)
+    fun getCustomerById(id: Long): CustomerDto {
+        val customer = customerRepository.findByIdAndDeletedAtIsNull(id)
             .orElseThrow { ResourceNotFoundException("Customer not found with id: $id") }
-
-        if (existing.email != customer.email && customerRepository.existsByEmailAndDeletedAtIsNull(customer.email)) {
-            throw ConflictException("Customer with email ${customer.email} already exists")
-        }
-
-        existing.email = customer.email
-        existing.firstName = customer.firstName
-        existing.lastName = customer.lastName
-        existing.phone = customer.phone
-        existing.dateOfBirth = customer.dateOfBirth
-
-        return customerRepository.save(existing)
+        return customerMapper.toDto(customer)
     }
 
-    fun getCustomerById(id: Long): Customer {
-        return customerRepository.findByIdAndDeletedAtIsNull(id)
-            .orElseThrow { ResourceNotFoundException("Customer not found with id: $id") }
-    }
-
-    fun getCustomerByEmail(email: String): Customer {
-        return customerRepository.findByEmailAndDeletedAtIsNull(email)
+    @Transactional(readOnly = true)
+    fun getCustomerByEmail(email: String): CustomerDto {
+        val customer = customerRepository.findByEmailAndDeletedAtIsNull(email)
             .orElseThrow { ResourceNotFoundException("Customer not found with email: $email") }
+        return customerMapper.toDto(customer)
     }
 
-    fun getAllCustomers(paginationRequest: PaginationRequest): PaginatedResponse<Customer> {
-        val pageable = PageRequest.of(paginationRequest.getPage(), paginationRequest.getSize())
-        val page = customerRepository.findAllActive(pageable)
+    @Transactional(readOnly = true)
+    fun getAllCustomers(pageable: Pageable): Page<CustomerDto> {
+        return customerRepository.findAllByDeletedAtIsNull(pageable)
+            .map { customerMapper.toDto(it) }
+    }
 
-        return PaginatedResponse(
-            content = page.content,
-            page = page.number,
-            size = page.size,
-            totalElements = page.totalElements,
-            totalPages = page.totalPages,
-            isFirst = page.isFirst,
-            isLast = page.isLast,
-            hasNext = page.hasNext(),
-            hasPrevious = page.hasPrevious()
-        )
+    fun updateCustomer(id: Long, dto: CustomerDto): CustomerDto {
+        val customer = customerRepository.findByIdAndDeletedAtIsNull(id)
+            .orElseThrow { ResourceNotFoundException("Customer not found with id: $id") }
+        
+        if (dto.email != customer.email) {
+            validateEmailUniqueness(dto.email)
+        }
+        
+        customer.apply {
+            email = dto.email
+            firstName = dto.firstName
+            lastName = dto.lastName
+            phone = dto.phone
+            dateOfBirth = dto.dateOfBirth
+        }
+        
+        val updated = customerRepository.save(customer)
+        return customerMapper.toDto(updated)
     }
 
     fun deleteCustomer(id: Long) {
         val customer = customerRepository.findByIdAndDeletedAtIsNull(id)
             .orElseThrow { ResourceNotFoundException("Customer not found with id: $id") }
-        customer.delete()
+        customer.deletedAt = java.time.LocalDateTime.now()
         customerRepository.save(customer)
     }
 
-    fun addLoyaltyPoints(customerId: Long, points: Int) {
-        val customer = customerRepository.findByIdAndDeletedAtIsNull(customerId)
-            .orElseThrow { ResourceNotFoundException("Customer not found with id: $customerId") }
-        customer.addLoyaltyPoints(points)
-        customerRepository.save(customer)
-    }
-
-    fun recordSpending(customerId: Long, amount: BigDecimal) {
-        val customer = customerRepository.findByIdAndDeletedAtIsNull(customerId)
-            .orElseThrow { ResourceNotFoundException("Customer not found with id: $customerId") }
-        customer.spendAmount(amount)
-        customerRepository.save(customer)
+    private fun validateEmailUniqueness(email: String) {
+        if (customerRepository.findByEmailAndDeletedAtIsNull(email).isPresent) {
+            throw ValidationException("Email already exists: $email")
+        }
     }
 }
