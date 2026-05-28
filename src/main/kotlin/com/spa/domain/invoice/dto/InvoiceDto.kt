@@ -11,7 +11,7 @@ data class InvoiceDto(
     val taxAmount: BigDecimal = BigDecimal.ZERO,
     val discountAmount: BigDecimal = BigDecimal.ZERO,
     val paymentStatus: String = "PENDING",
-    val dueAt: LocalDateTime,
+    val dueAt: LocalDateTime?,
     val paidAt: LocalDateTime? = null,
     val createdAt: LocalDateTime? = null,
     val updatedAt: LocalDateTime? = null

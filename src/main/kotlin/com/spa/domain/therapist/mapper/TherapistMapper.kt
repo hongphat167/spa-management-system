@@ -10,7 +10,7 @@ class TherapistMapper {
     fun toDto(therapist: Therapist): TherapistDto {
         return TherapistDto(
             id = therapist.id,
-            userId = therapist.user.id!!,
+            userId = therapist.user?.id!!,
             specialization = therapist.specialization,
             experienceYears = therapist.experienceYears,
             isAvailable = therapist.isAvailable,

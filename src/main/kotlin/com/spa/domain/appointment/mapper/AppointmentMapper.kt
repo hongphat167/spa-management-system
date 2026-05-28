@@ -17,9 +17,9 @@ class AppointmentMapper(
     fun toDto(appointment: Appointment): AppointmentDto {
         return AppointmentDto(
             id = appointment.id,
-            customerId = appointment.customer.id!!,
+            customerId = appointment.customer?.id!!,
             therapistId = appointment.therapist?.id,
-            serviceId = appointment.service.id!!,
+            serviceId = appointment.service?.id!!,
             appointmentDate = appointment.appointmentDate,
             endTime = appointment.endTime,
             status = appointment.status,

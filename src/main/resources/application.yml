@@ -3,8 +3,13 @@ spring:
     name: spa-management-system
     version: 1.0.0
 
+  security:
+    user:
+      name: admin
+      password: admin123
+
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:spa_mgmt_db}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:spa_mgmt_db}
     username: ${DB_USER:spa_user}
     password: ${DB_PASSWORD:spa_password}
     hikari:
@@ -33,10 +38,10 @@ spring:
     schemas: public
 
   jackson:
-    serialization:
+    BIGSERIALization:
       write-dates-as-timestamps: false
       indent-output: true
-    deserialization:
+    deBIGSERIALization:
       fail-on-unknown-properties: false
 
 server:

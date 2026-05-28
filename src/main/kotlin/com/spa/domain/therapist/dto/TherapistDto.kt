@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 data class TherapistDto(
     val id: Long? = null,
     val userId: Long,
-    val specialization: String,
+    val specialization: String?,
     val experienceYears: Int,
     val isAvailable: Boolean = true,
     val createdAt: LocalDateTime? = null,

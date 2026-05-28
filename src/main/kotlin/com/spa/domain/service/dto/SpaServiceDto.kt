@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 data class SpaServiceDto(
     val id: Long? = null,
     val name: String,
-    val description: String,
+    val description: String?,
     val price: BigDecimal,
     val durationMinutes: Int,
     val isActive: Boolean = true,

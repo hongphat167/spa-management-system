@@ -15,7 +15,16 @@ import java.time.LocalDateTime
     Index(name = "idx_appointments_appointment_date", columnList = "appointment_date"),
     Index(name = "idx_appointments_status", columnList = "status")
 ])
-class Appointment : BaseEntity() {
+class Appointment(
+    id: Long?,
+    therapist: Therapist?,
+    customer: Customer,
+    service: SpaService,
+    appointmentDate: LocalDateTime,
+    endTime: LocalDateTime,
+    status: String,
+    notes: String?
+) : BaseEntity() {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     var customer: Customer? = null

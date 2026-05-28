@@ -1,11 +1,10 @@
 package com.spa.domain.customer.service
 
-import com.spa.domain.customer.dto.CustomerDto
-import com.spa.domain.customer.entity.Customer
-import com.spa.domain.customer.mapper.CustomerMapper
-import com.spa.domain.customer.repository.CustomerRepository
 import com.spa.common.exception.ResourceNotFoundException
 import com.spa.common.exception.ValidationException
+import com.spa.domain.customer.dto.CustomerDto
+import com.spa.domain.customer.mapper.CustomerMapper
+import com.spa.domain.customer.repository.CustomerRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -41,7 +40,7 @@ class CustomerService(
 
     @Transactional(readOnly = true)
     fun getAllCustomers(pageable: Pageable): Page<CustomerDto> {
-        return customerRepository.findAllByDeletedAtIsNull(pageable)
+        return customerRepository.findAllActive(pageable)
             .map { customerMapper.toDto(it) }
     }
 

@@ -1,11 +1,10 @@
 package com.spa.domain.appointment.service
 
+import com.spa.common.exception.BusinessLogicException
+import com.spa.common.exception.ResourceNotFoundException
 import com.spa.domain.appointment.dto.AppointmentDto
-import com.spa.domain.appointment.entity.Appointment
 import com.spa.domain.appointment.mapper.AppointmentMapper
 import com.spa.domain.appointment.repository.AppointmentRepository
-import com.spa.common.exception.ResourceNotFoundException
-import com.spa.common.exception.BusinessLogicException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -35,19 +34,19 @@ class AppointmentService(
 
     @Transactional(readOnly = true)
     fun getAllAppointments(pageable: Pageable): Page<AppointmentDto> {
-        return appointmentRepository.findAllByDeletedAtIsNull(pageable)
+        return appointmentRepository.findAllActive(pageable)
             .map { appointmentMapper.toDto(it) }
     }
 
     @Transactional(readOnly = true)
     fun getAppointmentsByCustomerId(customerId: Long, pageable: Pageable): Page<AppointmentDto> {
-        return appointmentRepository.findAllByCustomerIdAndDeletedAtIsNull(customerId, pageable)
+        return appointmentRepository.findByCustomerId(customerId, pageable)
             .map { appointmentMapper.toDto(it) }
     }
 
     @Transactional(readOnly = true)
     fun getAppointmentsByTherapistId(therapistId: Long, pageable: Pageable): Page<AppointmentDto> {
-        return appointmentRepository.findAllByTherapistIdAndDeletedAtIsNull(therapistId, pageable)
+        return appointmentRepository.findByTherapistId(therapistId, pageable)
             .map { appointmentMapper.toDto(it) }
     }
 

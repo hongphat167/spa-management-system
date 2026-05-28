@@ -1,53 +1,23 @@
-version: '3.8'
-
 services:
+
   postgres:
     image: postgres:15-alpine
+
     container_name: spa_postgres
+
     environment:
-      POSTGRES_USER: ${DB_USER:-spa_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-spa_password}
-      POSTGRES_DB: ${DB_NAME:-spa_mgmt_db}
-      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: spa_user
+      POSTGRES_PASSWORD: spa_password
+      POSTGRES_DB: spa_mgmt_db
+
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "5433:5432"
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-spa_user} -d ${DB_NAME:-spa_mgmt_db}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - spa_network
 
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: spa_app
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-spa_mgmt_db}
-      DB_USER: ${DB_USER:-spa_user}
-      DB_PASSWORD: ${DB_PASSWORD:-spa_password}
-      SERVER_PORT: 8080
-      JWT_SECRET: ${JWT_SECRET:-spa-management-system-secret-key-change-in-production-environment}
-      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
-      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
-    ports:
-      - "${SERVER_PORT:-8080}:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - spa_network
     restart: unless-stopped
 
 volumes:
   postgres_data:
 
-networks:
-  spa_network:
-    driver: bridge

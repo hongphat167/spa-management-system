@@ -4,8 +4,8 @@ import com.spa.common.entity.BaseEntity
 import com.spa.domain.appointment.entity.Appointment
 import com.spa.domain.customer.entity.Customer
 import jakarta.persistence.*
-import java.time.LocalDateTime
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "invoices", indexes = [
@@ -13,7 +13,17 @@ import java.math.BigDecimal
     Index(name = "idx_invoices_payment_status", columnList = "payment_status"),
     Index(name = "idx_invoices_issued_at", columnList = "issued_at")
 ])
-class Invoice : BaseEntity() {
+class Invoice(
+    id: Long?,
+    appointment: Appointment,
+    customer: Customer,
+    totalAmount: BigDecimal,
+    taxAmount: BigDecimal,
+    discountAmount: BigDecimal,
+    paymentStatus: String,
+    dueAt: LocalDateTime?,
+    paidAt: LocalDateTime?
+) : BaseEntity() {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "appointment_id", nullable = false, unique = true)
     var appointment: Appointment? = null

@@ -1,16 +1,28 @@
 package com.spa.domain.customer.entity
 
 import com.spa.common.entity.BaseEntity
-import jakarta.persistence.*
-import java.time.LocalDate
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Index
+import jakarta.persistence.Table
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @Entity
 @Table(name = "customers", indexes = [
     Index(name = "idx_customers_email", columnList = "email"),
     Index(name = "idx_customers_is_active", columnList = "is_active")
 ])
-class Customer : BaseEntity() {
+class Customer(
+    id: Long?,
+    email: String,
+    firstName: String,
+    lastName: String,
+    phone: String?,
+    dateOfBirth: LocalDate?,
+    loyaltyPoints: Int,
+    totalSpent: BigDecimal
+) : BaseEntity() {
     @Column(name = "email", nullable = false, unique = true, length = 255)
     var email: String = ""
 

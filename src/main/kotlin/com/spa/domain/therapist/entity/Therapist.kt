@@ -9,7 +9,7 @@ import jakarta.persistence.*
     Index(name = "idx_therapists_user_id", columnList = "user_id"),
     Index(name = "idx_therapists_is_available", columnList = "is_available")
 ])
-class Therapist : BaseEntity() {
+class Therapist(id: Long?, specialization: String?, experienceYears: Int, isAvailable: Boolean) : BaseEntity() {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     var user: User? = null

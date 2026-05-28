@@ -1,11 +1,10 @@
 package com.spa.domain.invoice.service
 
+import com.spa.common.exception.BusinessLogicException
+import com.spa.common.exception.ResourceNotFoundException
 import com.spa.domain.invoice.dto.InvoiceDto
-import com.spa.domain.invoice.entity.Invoice
 import com.spa.domain.invoice.mapper.InvoiceMapper
 import com.spa.domain.invoice.repository.InvoiceRepository
-import com.spa.common.exception.ResourceNotFoundException
-import com.spa.common.exception.BusinessLogicException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -34,19 +33,19 @@ class InvoiceService(
 
     @Transactional(readOnly = true)
     fun getAllInvoices(pageable: Pageable): Page<InvoiceDto> {
-        return invoiceRepository.findAllByDeletedAtIsNull(pageable)
+        return invoiceRepository.findAllActive(pageable)
             .map { invoiceMapper.toDto(it) }
     }
 
     @Transactional(readOnly = true)
     fun getInvoicesByCustomerId(customerId: Long, pageable: Pageable): Page<InvoiceDto> {
-        return invoiceRepository.findAllByCustomerIdAndDeletedAtIsNull(customerId, pageable)
+        return invoiceRepository.findByCustomerId(customerId, pageable)
             .map { invoiceMapper.toDto(it) }
     }
 
     @Transactional(readOnly = true)
     fun getPendingInvoices(pageable: Pageable): Page<InvoiceDto> {
-        return invoiceRepository.findAllByPaymentStatusAndDeletedAtIsNull("PENDING", pageable)
+        return invoiceRepository.findByPaymentStatus("PENDING", pageable)
             .map { invoiceMapper.toDto(it) }
     }
 

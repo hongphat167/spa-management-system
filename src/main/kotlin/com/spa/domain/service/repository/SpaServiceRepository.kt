@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
-import java.util.Optional
+import java.util.*
 
 @Repository
 interface SpaServiceRepository : JpaRepository<SpaService, Long> {
@@ -15,6 +15,15 @@ interface SpaServiceRepository : JpaRepository<SpaService, Long> {
     @Query("SELECT s FROM SpaService s WHERE s.deletedAt IS NULL")
     fun findAllActive(pageable: Pageable): Page<SpaService>
 
-    @Query("SELECT s FROM SpaService s WHERE s.isActive = true AND s.deletedAt IS NULL")
-    fun findAllActiveServices(): List<SpaService>
+    @Query(
+        """
+    SELECT s
+    FROM SpaService s
+    WHERE s.isActive = true
+    AND s.deletedAt IS NULL
+"""
+    )
+    fun findAllActiveServices(
+        pageable: Pageable
+    ): Page<SpaService>
 }

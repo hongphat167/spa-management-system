@@ -8,86 +8,98 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import java.time.LocalDateTime
 
-/**
- * Global exception handler for all exceptions in the application
- */
 @RestControllerAdvice
-class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
+class ApiExceptionHandler {
 
-    /**
-     * Handle AppException and its subclasses
-     */
     @ExceptionHandler(AppException::class)
     fun handleAppException(
         ex: AppException,
         request: WebRequest
     ): ResponseEntity<ApiResponse<Any>> {
-        val response = ApiResponse(
+
+        val response = ApiResponse<Any>(
             status = "ERROR",
             message = ex.message ?: "An error occurred",
             timestamp = LocalDateTime.now()
         )
-        return ResponseEntity(response, HttpStatus.valueOf(ex.statusCode))
+
+        return ResponseEntity(
+            response,
+            HttpStatus.valueOf(ex.statusCode)
+        )
     }
 
-    /**
-     * Handle validation errors from @Valid annotation
-     */
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(
         ex: MethodArgumentNotValidException,
         request: WebRequest
     ): ResponseEntity<ApiResponse<Any>> {
+
         val errors = mutableMapOf<String, String>()
+
         ex.bindingResult.allErrors.forEach { error ->
-            val fieldName = (error as? FieldError)?.field ?: error.objectName
-            val message = error.defaultMessage ?: "Invalid value"
+
+            val fieldName =
+                (error as? FieldError)?.field
+                    ?: error.objectName
+
+            val message =
+                error.defaultMessage
+                    ?: "Invalid value"
+
             errors[fieldName] = message
         }
 
-        val response = ApiResponse(
+        val response = ApiResponse<Any>(
             status = "ERROR",
             message = "Validation failed",
             errors = errors,
             timestamp = LocalDateTime.now()
         )
-        return ResponseEntity(response, HttpStatus.BAD_REQUEST)
+
+        return ResponseEntity(
+            response,
+            HttpStatus.BAD_REQUEST
+        )
     }
 
-    /**
-     * Handle IllegalArgumentException
-     */
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgumentException(
         ex: IllegalArgumentException,
         request: WebRequest
     ): ResponseEntity<ApiResponse<Any>> {
-        val response = ApiResponse(
+
+        val response = ApiResponse<Any>(
             status = "ERROR",
             message = ex.message ?: "Invalid argument provided",
             timestamp = LocalDateTime.now()
         )
-        return ResponseEntity(response, HttpStatus.BAD_REQUEST)
+
+        return ResponseEntity(
+            response,
+            HttpStatus.BAD_REQUEST
+        )
     }
 
-    /**
-     * Handle generic exceptions
-     */
     @ExceptionHandler(Exception::class)
     fun handleGlobalException(
         ex: Exception,
         request: WebRequest
     ): ResponseEntity<ApiResponse<Any>> {
-        val response = ApiResponse(
+
+        ex.printStackTrace()
+
+        val response = ApiResponse<Any>(
             status = "ERROR",
             message = "An unexpected error occurred. Please try again later.",
             timestamp = LocalDateTime.now()
         )
-        // Log the exception here
-        ex.printStackTrace()
-        return ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR)
+
+        return ResponseEntity(
+            response,
+            HttpStatus.INTERNAL_SERVER_ERROR
+        )
     }
 }

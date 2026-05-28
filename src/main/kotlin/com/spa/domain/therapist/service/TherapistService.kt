@@ -1,10 +1,9 @@
 package com.spa.domain.therapist.service
 
+import com.spa.common.exception.ResourceNotFoundException
 import com.spa.domain.therapist.dto.TherapistDto
-import com.spa.domain.therapist.entity.Therapist
 import com.spa.domain.therapist.mapper.TherapistMapper
 import com.spa.domain.therapist.repository.TherapistRepository
-import com.spa.common.exception.ResourceNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -32,13 +31,13 @@ class TherapistService(
 
     @Transactional(readOnly = true)
     fun getAllTherapists(pageable: Pageable): Page<TherapistDto> {
-        return therapistRepository.findAllByDeletedAtIsNull(pageable)
+        return therapistRepository.findAllActive(pageable)
             .map { therapistMapper.toDto(it) }
     }
 
     @Transactional(readOnly = true)
     fun getAvailableTherapists(pageable: Pageable): Page<TherapistDto> {
-        return therapistRepository.findAllByIsAvailableAndDeletedAtIsNull(true, pageable)
+        return therapistRepository.findAvailableTherapists(pageable)
             .map { therapistMapper.toDto(it) }
     }
 

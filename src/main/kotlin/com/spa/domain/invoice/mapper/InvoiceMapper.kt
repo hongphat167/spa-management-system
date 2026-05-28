@@ -1,9 +1,9 @@
 package com.spa.domain.invoice.mapper
 
-import com.spa.domain.invoice.dto.InvoiceDto
-import com.spa.domain.invoice.entity.Invoice
 import com.spa.domain.appointment.repository.AppointmentRepository
 import com.spa.domain.customer.repository.CustomerRepository
+import com.spa.domain.invoice.dto.InvoiceDto
+import com.spa.domain.invoice.entity.Invoice
 import org.springframework.stereotype.Component
 
 @Component
@@ -15,8 +15,8 @@ class InvoiceMapper(
     fun toDto(invoice: Invoice): InvoiceDto {
         return InvoiceDto(
             id = invoice.id,
-            appointmentId = invoice.appointment.id!!,
-            customerId = invoice.customer.id!!,
+            appointmentId = invoice.appointment?.id!!,
+            customerId = invoice.customer?.id!!,
             totalAmount = invoice.totalAmount,
             taxAmount = invoice.taxAmount,
             discountAmount = invoice.discountAmount,

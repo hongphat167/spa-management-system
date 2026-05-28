@@ -1,10 +1,9 @@
 package com.spa.domain.service.service
 
+import com.spa.common.exception.ResourceNotFoundException
 import com.spa.domain.service.dto.SpaServiceDto
-import com.spa.domain.service.entity.SpaService
 import com.spa.domain.service.mapper.SpaServiceMapper
 import com.spa.domain.service.repository.SpaServiceRepository
-import com.spa.common.exception.ResourceNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -32,13 +31,13 @@ class SpaServiceService(
 
     @Transactional(readOnly = true)
     fun getAllServices(pageable: Pageable): Page<SpaServiceDto> {
-        return spaServiceRepository.findAllByDeletedAtIsNull(pageable)
+        return spaServiceRepository.findAllActive(pageable)
             .map { spaServiceMapper.toDto(it) }
     }
 
     @Transactional(readOnly = true)
     fun getActiveServices(pageable: Pageable): Page<SpaServiceDto> {
-        return spaServiceRepository.findAllByIsActiveAndDeletedAtIsNull(true, pageable)
+        return spaServiceRepository.findAllActiveServices(pageable)
             .map { spaServiceMapper.toDto(it) }
     }
 

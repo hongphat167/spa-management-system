@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
-import java.util.Optional
+import java.util.*
 
 @Repository
 interface TherapistRepository : JpaRepository<Therapist, Long> {
@@ -17,5 +17,5 @@ interface TherapistRepository : JpaRepository<Therapist, Long> {
     fun findAllActive(pageable: Pageable): Page<Therapist>
 
     @Query("SELECT t FROM Therapist t WHERE t.isAvailable = true AND t.deletedAt IS NULL")
-    fun findAvailableTherapists(): List<Therapist>
+    fun findAvailableTherapists(pageable: Pageable): Page<Therapist>
 }
