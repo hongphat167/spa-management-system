@@ -1,0 +1,26 @@
+package com.spa.domain.service.entity
+
+import com.spa.common.entity.BaseEntity
+import jakarta.persistence.*
+import java.math.BigDecimal
+
+@Entity
+@Table(name = "spa_services", indexes = [
+    Index(name = "idx_spa_services_is_active", columnList = "is_active")
+])
+class SpaService : BaseEntity() {
+    @Column(name = "name", nullable = false, length = 255)
+    var name: String = ""
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    var description: String? = null
+
+    @Column(name = "price", nullable = false, precision = 10, scale = 2)
+    var price: BigDecimal = BigDecimal.ZERO
+
+    @Column(name = "duration_minutes", nullable = false)
+    var durationMinutes: Int = 0
+
+    @Column(name = "is_active", nullable = false)
+    var isActive: Boolean = true
+}
