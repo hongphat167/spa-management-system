@@ -48,6 +48,7 @@ class SpaServiceService(
         service.apply {
             name = dto.name
             description = dto.description
+            imageUrl = dto.imageUrl
             price = dto.price
             durationMinutes = dto.durationMinutes
             isActive = dto.isActive

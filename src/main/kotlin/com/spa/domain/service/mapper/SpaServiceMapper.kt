@@ -12,6 +12,7 @@ class SpaServiceMapper {
             id = service.id,
             name = service.name,
             description = service.description,
+            imageUrl = service.imageUrl,
             price = service.price,
             durationMinutes = service.durationMinutes,
             isActive = service.isActive,
@@ -25,6 +26,7 @@ class SpaServiceMapper {
             id = dto.id,
             name = dto.name,
             description = dto.description,
+            imageUrl = dto.imageUrl,
             price = dto.price,
             durationMinutes = dto.durationMinutes,
             isActive = dto.isActive

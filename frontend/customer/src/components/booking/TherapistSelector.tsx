@@ -1,19 +1,48 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Check, UserX } from 'lucide-react';
-import { therapists } from '@/lib/mockData';
 import { useBookingStore } from '@/store/bookingStore';
 import { cn } from '@/lib/utils';
+import { fetchAvailableTherapists } from '@/lib/api';
+import { Therapist } from '@/types';
 
 export default function TherapistSelector() {
   const { bookingData, setTherapist } = useBookingStore();
-  const selectedService = bookingData.service;
+  const [therapists, setTherapists] = useState<Therapist[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const availableTherapists = selectedService
-    ? therapists.filter((t) => t.services.includes(selectedService.id))
-    : therapists;
+  useEffect(() => {
+    let active = true;
 
-  const displayTherapists = availableTherapists.length > 0 ? availableTherapists : therapists;
+    async function loadTherapists() {
+      try {
+        setIsLoading(true);
+        const result = await fetchAvailableTherapists();
+        if (active) {
+          setTherapists(result);
+          setError(null);
+        }
+      } catch (loadError) {
+        if (active) {
+          setError(loadError instanceof Error ? loadError.message : 'Không thể tải chuyên viên');
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadTherapists();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const displayTherapists = therapists;
 
   return (
     <div>
@@ -21,6 +50,9 @@ export default function TherapistSelector() {
       <p className="text-spa-gray mb-6">
         Chọn chuyên viên bạn muốn hoặc để chúng tôi phân công cho bạn
       </p>
+
+      {isLoading && <p className="text-sm text-spa-gray">Đang tải chuyên viên...</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
 
       {/* No preference option */}
       <motion.div

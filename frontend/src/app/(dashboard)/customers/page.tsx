@@ -92,6 +92,7 @@ export default function CustomersPage() {
       <Modal open={open} onClose={() => setOpen(false)} title={t("addCustomer")}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           <Input placeholder={t("columns.name")} {...register("firstName", { required: true })} />
+          <Input placeholder="Last name" {...register("lastName", { required: true })} />
           <Input placeholder={t("columns.email")} {...register("email", { required: true })} />
           <Input placeholder={t("columns.phone")} {...register("phone")} />
           <div className="flex items-center justify-end gap-2">

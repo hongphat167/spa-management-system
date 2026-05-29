@@ -1,9 +1,11 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { services } from '@/lib/mockData';
 import ServiceCard from '@/components/services/ServiceCard';
+import { fetchConfiguredServices } from '@/lib/api';
+import { Service } from '@/types';
 
 const containerVariants = {
   hidden: {},
@@ -20,7 +22,30 @@ const itemVariants = {
 };
 
 export default function FeaturedServices() {
-  const featured = services.slice(0, 6);
+  const [services, setServices] = useState<Service[]>([]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadServices() {
+      try {
+        const result = await fetchConfiguredServices();
+        if (active) {
+          setServices(result.slice(0, 6));
+        }
+      } catch {
+        if (active) {
+          setServices([]);
+        }
+      }
+    }
+
+    loadServices();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <section className="py-20 bg-cream">
@@ -48,7 +73,7 @@ export default function FeaturedServices() {
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {featured.map((service) => (
+          {services.map((service) => (
             <motion.div key={service.id} variants={itemVariants}>
               <ServiceCard service={service} />
             </motion.div>

@@ -53,6 +53,18 @@ class Invoice(
     @Column(name = "paid_at")
     var paidAt: LocalDateTime? = null
 
+    init {
+        this.id = id
+        this.appointment = appointment
+        this.customer = customer
+        this.totalAmount = totalAmount
+        this.taxAmount = taxAmount
+        this.discountAmount = discountAmount
+        this.paymentStatus = paymentStatus
+        this.dueAt = dueAt
+        this.paidAt = paidAt
+    }
+
     fun isPaid(): Boolean = paymentStatus == "PAID"
     fun isOverdue(): Boolean = paymentStatus == "PENDING" && dueAt != null && LocalDateTime.now() > dueAt!!
 }

@@ -1,18 +1,55 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Star, Check } from 'lucide-react';
-import { services } from '@/lib/mockData';
 import { useBookingStore } from '@/store/bookingStore';
 import { formatPrice, formatDuration } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { fetchBookingServices } from '@/lib/api';
+import { Service } from '@/types';
 
 export default function ServiceSelector() {
   const { bookingData, setService } = useBookingStore();
+  const [services, setServices] = useState<Service[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadServices() {
+      try {
+        setIsLoading(true);
+        const result = await fetchBookingServices();
+        if (active) {
+          setServices(result);
+          setError(null);
+        }
+      } catch (loadError) {
+        if (active) {
+          setError(loadError instanceof Error ? loadError.message : 'Không thể tải dịch vụ');
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadServices();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <div>
       <h2 className="text-2xl font-bold text-dark mb-2">Chọn Dịch Vụ</h2>
       <p className="text-spa-gray mb-6">Vui lòng chọn dịch vụ bạn muốn sử dụng</p>
+
+      {isLoading && <p className="text-sm text-spa-gray">Đang tải dịch vụ...</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {services.map((service, index) => {

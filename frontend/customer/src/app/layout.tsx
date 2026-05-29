@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ToastViewport } from '@/components/ui/Toast';
 
 export const metadata: Metadata = {
   title: 'Lotus Spa - Trải Nghiệm Thư Giãn Cao Cấp',
@@ -9,7 +10,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi">
-      <body>{children}</body>
+      <body>
+        {children}
+        <ToastViewport />
+      </body>
     </html>
   );
 }

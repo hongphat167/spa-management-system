@@ -47,6 +47,17 @@ class Customer(
     @Column(name = "is_active", nullable = false)
     var isActive: Boolean = true
 
+    init {
+        this.id = id
+        this.email = email
+        this.firstName = firstName
+        this.lastName = lastName
+        this.phone = phone
+        this.dateOfBirth = dateOfBirth
+        this.loyaltyPoints = loyaltyPoints
+        this.totalSpent = totalSpent
+    }
+
     fun getFullName(): String = "$firstName $lastName"
 
     fun addLoyaltyPoints(points: Int) {

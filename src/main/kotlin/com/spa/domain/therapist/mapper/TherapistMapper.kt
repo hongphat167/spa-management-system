@@ -11,6 +11,10 @@ class TherapistMapper {
         return TherapistDto(
             id = therapist.id,
             userId = therapist.user?.id!!,
+            userFirstName = therapist.user?.firstName,
+            userLastName = therapist.user?.lastName,
+            userEmail = therapist.user?.email,
+            userPhone = therapist.user?.phone,
             specialization = therapist.specialization,
             experienceYears = therapist.experienceYears,
             isAvailable = therapist.isAvailable,

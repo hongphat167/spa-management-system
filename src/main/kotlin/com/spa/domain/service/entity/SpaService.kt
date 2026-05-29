@@ -15,6 +15,7 @@ class SpaService(
     id: Long?,
     name: String,
     description: String?,
+    imageUrl: String?,
     price: BigDecimal,
     durationMinutes: Int,
     isActive: Boolean
@@ -25,6 +26,9 @@ class SpaService(
     @Column(name = "description", columnDefinition = "TEXT")
     var description: String? = null
 
+    @Column(name = "image_url", columnDefinition = "TEXT")
+    var imageUrl: String? = null
+
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     var price: BigDecimal = BigDecimal.ZERO
 
@@ -33,4 +37,14 @@ class SpaService(
 
     @Column(name = "is_active", nullable = false)
     var isActive: Boolean = true
+
+    init {
+        this.id = id
+        this.name = name
+        this.description = description
+        this.imageUrl = imageUrl
+        this.price = price
+        this.durationMinutes = durationMinutes
+        this.isActive = isActive
+    }
 }

@@ -1,4 +1,5 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api";
+const API_TOAST_EVENT = "spa-api-toast";
 
 export type AppointmentStatus = "scheduled" | "inProgress" | "completed" | "cancelled";
 export type InvoiceStatus = "paid" | "pending" | "overdue";
@@ -32,6 +33,7 @@ export interface SpaServiceDto {
   id: number;
   name: string;
   description?: string;
+  imageUrl?: string;
   price: number;
   durationMinutes: number;
   isActive: boolean;
@@ -98,6 +100,7 @@ export interface ServiceRow {
   id: number;
   name: string;
   description: string;
+  imageUrl?: string;
   price: number;
   durationMinutes: number;
   isActive: boolean;
@@ -135,7 +138,31 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
+    const responseText = await response.text();
+    let message = `Request failed with status ${response.status}`;
+
+    if (responseText) {
+      try {
+        const parsed = JSON.parse(responseText) as { message?: string; error?: string; detail?: string };
+        message = parsed.message ?? parsed.error ?? parsed.detail ?? responseText;
+      } catch {
+        message = responseText;
+      }
+    }
+
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent(API_TOAST_EVENT, {
+          detail: {
+            kind: "error",
+            message,
+            status: response.status,
+          },
+        }),
+      );
+    }
+
+    throw new Error(message);
   }
 
   if (response.status === 204) {
@@ -257,6 +284,18 @@ export async function createCustomer(payload: Partial<CustomerDto>): Promise<Cus
   return requestJson<CustomerDto>(`/v1/customers`, { method: "POST", body: JSON.stringify(body), headers: { "Content-Type": "application/json" } });
 }
 
+export async function updateCustomer(id: number, payload: Partial<CustomerDto>): Promise<CustomerDto> {
+  return requestJson<CustomerDto>(`/v1/customers/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function deleteCustomer(id: number): Promise<void> {
+  await requestJson<void>(`/v1/customers/${id}`, { method: "DELETE" });
+}
+
 export async function fetchServiceRows(page = 0, size = 20): Promise<PageResponse<ServiceRow>> {
   const response = await requestJson<PageResponse<SpaServiceDto>>(`/v1/services?${buildPageQuery(page, size)}`);
 
@@ -266,11 +305,121 @@ export async function fetchServiceRows(page = 0, size = 20): Promise<PageRespons
       id: service.id,
       name: service.name,
       description: service.description || "",
+      imageUrl: service.imageUrl,
       price: service.price,
       durationMinutes: service.durationMinutes,
       isActive: service.isActive,
     })),
   };
+}
+
+export async function fetchActiveServiceRows(page = 0, size = 20): Promise<PageResponse<ServiceRow>> {
+  const response = await requestJson<PageResponse<SpaServiceDto>>(`/v1/services/active?${buildPageQuery(page, size)}`);
+
+  return {
+    ...response,
+    content: response.content.map((service) => ({
+      id: service.id,
+      name: service.name,
+      description: service.description || "",
+      imageUrl: service.imageUrl,
+      price: service.price,
+      durationMinutes: service.durationMinutes,
+      isActive: service.isActive,
+    })),
+  };
+}
+
+export async function createService(payload: Partial<SpaServiceDto>): Promise<SpaServiceDto> {
+  return requestJson<SpaServiceDto>(`/v1/services`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function updateService(id: number, payload: Partial<SpaServiceDto>): Promise<SpaServiceDto> {
+  return requestJson<SpaServiceDto>(`/v1/services/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function deleteService(id: number): Promise<void> {
+  await requestJson<void>(`/v1/services/${id}`, { method: "DELETE" });
+}
+
+export async function fetchAvailableTherapistRows(page = 0, size = 20): Promise<PageResponse<TherapistDto>> {
+  return requestJson<PageResponse<TherapistDto>>(`/v1/therapists/available?${buildPageQuery(page, size)}`);
+}
+
+export async function createTherapist(payload: Partial<TherapistDto>): Promise<TherapistDto> {
+  return requestJson<TherapistDto>(`/v1/therapists`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function updateTherapist(id: number, payload: Partial<TherapistDto>): Promise<TherapistDto> {
+  return requestJson<TherapistDto>(`/v1/therapists/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function deleteTherapist(id: number): Promise<void> {
+  await requestJson<void>(`/v1/therapists/${id}`, { method: "DELETE" });
+}
+
+export async function createAppointment(payload: Partial<AppointmentDto>): Promise<AppointmentDto> {
+  return requestJson<AppointmentDto>(`/v1/appointments`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function updateAppointment(id: number, payload: Partial<AppointmentDto>): Promise<AppointmentDto> {
+  return requestJson<AppointmentDto>(`/v1/appointments/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function cancelAppointment(id: number): Promise<void> {
+  await requestJson<void>(`/v1/appointments/${id}/cancel`, { method: "POST" });
+}
+
+export async function deleteAppointment(id: number): Promise<void> {
+  await requestJson<void>(`/v1/appointments/${id}`, { method: "DELETE" });
+}
+
+export async function createInvoice(payload: Partial<InvoiceDto>): Promise<InvoiceDto> {
+  return requestJson<InvoiceDto>(`/v1/invoices`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function updateInvoice(id: number, payload: Partial<InvoiceDto>): Promise<InvoiceDto> {
+  return requestJson<InvoiceDto>(`/v1/invoices/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function markInvoiceAsPaid(id: number): Promise<InvoiceDto> {
+  return requestJson<InvoiceDto>(`/v1/invoices/${id}/pay`, { method: "POST" });
+}
+
+export async function deleteInvoice(id: number): Promise<void> {
+  await requestJson<void>(`/v1/invoices/${id}`, { method: "DELETE" });
 }
 
 export async function fetchInvoiceRows(page = 0, size = 20): Promise<PageResponse<InvoiceRow>> {

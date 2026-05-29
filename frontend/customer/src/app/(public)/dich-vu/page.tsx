@@ -1,18 +1,43 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
-import { services } from '@/lib/mockData';
 import ServiceCard from '@/components/services/ServiceCard';
 import ServiceFilter from '@/components/services/ServiceFilter';
+import { fetchConfiguredServices } from '@/lib/api';
+import { Service } from '@/types';
 
 export default function DichVuPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [services, setServices] = useState<Service[]>([]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadServices() {
+      try {
+        const result = await fetchConfiguredServices();
+        if (active) {
+          setServices(result);
+        }
+      } catch {
+        if (active) {
+          setServices([]);
+        }
+      }
+    }
+
+    loadServices();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const categories = useMemo(() => {
     return Array.from(new Set(services.map((s) => s.category)));
-  }, []);
+  }, [services]);
 
   const filtered = useMemo(() => {
     return services.filter((s) => {
@@ -23,7 +48,7 @@ export default function DichVuPage() {
         s.description.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [services, selectedCategory, searchQuery]);
 
   return (
     <div className="min-h-screen bg-cream py-12">

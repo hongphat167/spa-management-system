@@ -8,7 +8,17 @@ import jakarta.persistence.*
     Index(name = "idx_users_email", columnList = "email"),
     Index(name = "idx_users_is_active", columnList = "is_active")
 ])
-class User : BaseEntity() {
+class User(
+        id: Long? = null,
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        phone: String? = null,
+        role: String = "CUSTOMER",
+        isActive: Boolean = true
+    ) : BaseEntity() {
+
     @Column(name = "email", nullable = false, unique = true, length = 255)
     var email: String = ""
 
@@ -29,6 +39,17 @@ class User : BaseEntity() {
 
     @Column(name = "is_active", nullable = false)
     var isActive: Boolean = true
+
+    init {
+        this.id = id
+        this.email = email
+        this.password = password
+        this.firstName = firstName
+        this.lastName = lastName
+        this.phone = phone
+        this.role = role
+        this.isActive = isActive
+    }
 
     fun getFullName(): String = "$firstName $lastName"
 }

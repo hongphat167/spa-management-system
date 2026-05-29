@@ -49,6 +49,17 @@ class Appointment(
     @Column(name = "notes", columnDefinition = "TEXT")
     var notes: String? = null
 
+    init {
+        this.id = id
+        this.customer = customer
+        this.service = service
+        this.therapist = therapist
+        this.appointmentDate = appointmentDate
+        this.endTime = endTime
+        this.status = status
+        this.notes = notes
+    }
+
     fun isCompleted(): Boolean = status == "COMPLETED"
     fun isCancelled(): Boolean = status == "CANCELLED"
     fun isPending(): Boolean = status == "SCHEDULED"

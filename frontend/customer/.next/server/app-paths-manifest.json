@@ -1,1 +1,8 @@
-{}
+{
+  "/not-found": "app/not-found.js",
+  "/(public)/dich-vu/page": "app/(public)/dich-vu/page.js",
+  "/(public)/page": "app/(public)/page.js",
+  "/(public)/san-pham/page": "app/(public)/san-pham/page.js",
+  "/(public)/dich-vu/[id]/page": "app/(public)/dich-vu/[id]/page.js",
+  "/(public)/dat-lich/page": "app/(public)/dat-lich/page.js"
+}

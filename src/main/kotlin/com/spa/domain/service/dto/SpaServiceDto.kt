@@ -7,6 +7,7 @@ data class SpaServiceDto(
     val id: Long? = null,
     val name: String,
     val description: String?,
+    val imageUrl: String? = null,
     val price: BigDecimal,
     val durationMinutes: Int,
     val isActive: Boolean = true,

@@ -1,22 +1,30 @@
 'use client';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { CheckCircle, Calendar, Clock, User, Mail, Phone, Sparkles } from 'lucide-react';
 import { useBookingStore } from '@/store/bookingStore';
 import { formatPrice, formatDuration } from '@/lib/utils';
+import { submitPublicBooking } from '@/lib/api';
 
 export default function BookingConfirmation() {
   const [confirmed, setConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { bookingData, resetBooking } = useBookingStore();
   const { service, therapist, date, time, customerInfo } = bookingData;
 
   const handleConfirm = async () => {
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setConfirmed(true);
-    setIsLoading(false);
+    try {
+      setIsLoading(true);
+      setError(null);
+      await submitPublicBooking(bookingData);
+      setConfirmed(true);
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Không thể xác nhận đặt lịch');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (confirmed) {
@@ -170,6 +178,8 @@ export default function BookingConfirmation() {
           </>
         )}
       </button>
+
+      {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
     </div>
   );
 }

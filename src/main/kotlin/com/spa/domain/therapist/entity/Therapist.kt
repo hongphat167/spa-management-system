@@ -22,4 +22,11 @@ class Therapist(id: Long?, specialization: String?, experienceYears: Int, isAvai
 
     @Column(name = "is_available", nullable = false)
     var isAvailable: Boolean = true
+
+    init {
+        this.id = id
+        this.specialization = specialization
+        this.experienceYears = experienceYears
+        this.isAvailable = isAvailable
+    }
 }
