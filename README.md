@@ -40,6 +40,38 @@ The application will be available at `http://localhost:8080/api`
 ./gradlew bootRun
 ```
 
+## Run Full Project (Backend + Frontend)
+
+### 1) Start Backend API
+
+```bash
+docker-compose up -d
+```
+
+Backend URL: `http://localhost:8080/api`
+
+### 2) Start Admin Dashboard Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Admin URL: `http://localhost:3000`
+
+### 3) Start Customer Website Frontend
+
+Open a new terminal:
+
+```bash
+cd frontend/customer
+npm install
+npm run dev
+```
+
+Customer URL: `http://localhost:3001`
+
 ## API Documentation
 
 - **Swagger UI**: http://localhost:8080/api/swagger-ui.html
